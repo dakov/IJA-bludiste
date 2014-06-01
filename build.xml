@@ -1,0 +1,88 @@
+<project name="ija2014" default="compile" basedir=".">
+	<description>IJA> project</description>
+
+	<property name="src" location="src"/>
+	<property name="build" location="build"/>
+	<property name="dist-server" location="dest-server"/>
+	<property name="dist-client" location="dest-client"/>
+	<property name="lib" location="lib"/>
+	<property name="doc" location="doc"/>
+	<property name="examples" location="examples"/>
+
+<!-- Clean -->
+	<target name="clean">
+		<delete dir="${build}"/>
+		<delete dir="${dist-server}"/>
+		<delete dir="${dist-client}"/>
+		<delete dir="${doc}"/>
+	</target>
+
+<!-- Compile all -->
+	<target name="build" depends="clean">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${doc}"/>
+		<javac srcdir="${src}" destdir="${build}" encoding="utf-8" includeantruntime="false"/>
+	</target>
+
+<!-- JAR server/client and documentation -->
+	<target name="compile" depends="clean, build, doc">
+		<mkdir dir="${dist-server}"/>
+		<jar destfile="${dist-server}/ija2014-server.jar" basedir="${build}">
+			<manifest>
+                <attribute name="Main-Class" value="ija.server.Server"/>
+            </manifest>
+		</jar>
+		 <copy todir="${dist-server}/maps">
+		   	<fileset dir="${examples}/maps"/>
+		</copy>
+		
+		<mkdir dir="${dist-client}"/>
+		<jar destfile="${dist-client}/ija2014-client.jar" basedir="${build}">
+			<manifest>
+                <attribute name="Main-Class" value="ija.client.Client"/>
+            </manifest>
+		</jar>
+		 <copy todir="${dist-client}/res">
+		   	<fileset dir="${examples}/res"/>
+		</copy>
+	</target>
+
+<!-- Generates documentation -->
+	<target name="doc">
+		<mkdir dir="${doc}"/>
+		<javadoc sourcepath="${src}" destdir="${doc}" encoding="UTF-8" charset="UTF-8" docencoding="UTF-8">
+		</javadoc>	
+	</target>
+
+<!-- Run server -->
+<target name="server">
+	<java fork="true" jar="${dist-server}/ija2014-server.jar" />
+</target>
+
+<target name="client">
+	<java fork="true" jar="${dist-client}/ija2014-client.jar" />
+</target>
+
+<!-- Run server and two clients -->
+	<target name="run">
+		<parallel>
+			<sequential>
+				<java fork="true" jar="${dist-server}/ija2014-server.jar" >
+				</java>
+			</sequential>
+
+			<sequential>
+				<java fork="true" jar="${dist-client}/ija2014-client.jar" >
+				</java>
+			</sequential>
+
+			<sequential>
+				<java fork="true" jar="${dist-client}/ija2014-client.jar">
+				</java>
+			</sequential>
+		</parallel>
+	</target>
+	
+</project>
+
+
